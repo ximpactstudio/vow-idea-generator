@@ -1,7 +1,7 @@
 "use client";
 
 import type { ClassificationSummary } from "@/lib/types";
-import { Header } from "./Header";
+import Header from "@/components/Header";
 
 interface ThankYouProps {
   summary: ClassificationSummary;
