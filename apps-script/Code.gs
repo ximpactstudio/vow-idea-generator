@@ -10,80 +10,93 @@
 
 function doPost(e) {
   try {
-    var payload = JSON.parse(e.postData.contents || "{}");
+    const payload = JSON.parse(e.postData.contents || "{}");
 
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var intake = ss.getSheetByName("Idea Intake");
-    if (!intake) throw new Error('Missing sheet tab "Idea Intake"');
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const intake = ss.getSheetByName("Idea Intake");
+    const meta = ss.getSheetByName("Meta");
+    if (!intake) throw new Error('Missing "Idea Intake" sheet');
+    if (!meta) throw new Error('Missing "Meta" sheet');
 
-    var meta = ss.getSheetByName("Meta");
-    if (!meta) throw new Error('Missing sheet tab "Meta" (create Meta, set B1 = 172)');
-
-    // Helper: accept both Next.js keys ("Idea (raw)") and snake_case (idea_raw)
-    var get = function(key, snakeKey, def) {
-      def = def || "";
-      if (payload[key] != null && payload[key] !== "") return payload[key];
-      if (snakeKey && payload[snakeKey] != null && payload[snakeKey] !== "") return payload[snakeKey];
-      return def;
+    const get = (obj, keys, fallback = "") => {
+      for (var i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        if (obj && obj[k] !== undefined && obj[k] !== null && obj[k] !== "") return obj[k];
+      }
+      return fallback;
     };
 
-    var now = new Date();
-    var row = [
+    const toStr = (v) => (v === undefined || v === null) ? "" : String(v);
+
+    const now = new Date();
+
+    const idea = toStr(get(payload, ["idea", "idea_raw", "ideaRaw", "ideaText"]));
+    const repeatability = toStr(get(payload, ["repeatability", "repeatable", "repeatabilityText"]));
+    const name = toStr(get(payload, ["name", "your_name", "yourName"]));
+    const email = toStr(get(payload, ["email", "your_email", "yourEmail"]));
+    const whoFor = toStr(get(payload, ["who_for", "whoFor", "audience"]));
+    const moment = toStr(get(payload, ["moment", "trigger", "occasion"]));
+    const success = toStr(get(payload, ["success", "success_metric", "successMetric"]));
+    const links = toStr(get(payload, ["links", "references", "link"]));
+    const h1 = toStr(get(payload, ["h1", "idea_h1", "ideaH1"]));
+    const h2 = toStr(get(payload, ["h2", "idea_h2", "ideaH2"]));
+    const h3 = toStr(get(payload, ["h3", "idea_h3", "ideaH3"]));
+    const bulletsVal = get(payload, ["bullets"], "");
+    const bullets = Array.isArray(bulletsVal) ? bulletsVal.join(" | ") : toStr(bulletsVal);
+    const type = toStr(get(payload, ["type", "idea_type", "ideaType"]));
+    const horizon = toStr(get(payload, ["horizon", "Horizon"]));
+    const component = toStr(get(payload, ["component", "component_area", "componentArea"]));
+    const area = toStr(get(payload, ["area", "componentAreaDetail", "component_detail"]));
+    const tagsVal = get(payload, ["tags"], "");
+    const tags = Array.isArray(tagsVal) ? tagsVal.join(", ") : toStr(tagsVal);
+    const confidence = toStr(get(payload, ["confidence"]));
+    const rationale = toStr(get(payload, ["rationale", "reasoning"]));
+
+    const row = [
       now,
-      get("Idea (raw)", "idea_raw") || get("idea"),
-      get("Repeatability", "repeatability"),
-      get("Name", "name"),
-      get("Email", "email"),
-      get("Who for", "who_for"),
-      get("Moment", "moment"),
-      get("Success", "success"),
-      get("Links", "links"),
-      get("Idea H1", "idea_h1"),
-      get("Idea H2", "idea_h2"),
-      Array.isArray(payload.Bullets) ? payload.Bullets.join(" | ") : (Array.isArray(payload.bullets) ? payload.bullets.join(" | ") : (get("Bullets", "bullets") || "")),
-      get("Type", "type"),
-      get("Horizon", "horizon"),
-      get("Component Area", "component_area"),
-      Array.isArray(payload.Tags) ? payload.Tags.join(", ") : (get("Tags", "tags") || ""),
-      get("Confidence", "confidence"),
-      get("Rationale", "rationale"),
-      get("Source", "source") || "Web intake",
-      get("Status", "status") || "New",
+      idea,
+      repeatability,
+      name,
+      email,
+      whoFor,
+      moment,
+      success,
+      links,
+      h1,
+      h2,
+      h3,
+      bullets,
+      type,
+      horizon,
+      component,
+      area,
+      tags,
+      confidence,
+      rationale,
+      "Web Intake",
+      "New"
     ];
+
     intake.appendRow(row);
 
-    // Increment counter atomically (LockService prevents race conditions)
-    var lock = LockService.getScriptLock();
+    // increment counter with lock
+    const lock = LockService.getScriptLock();
     lock.waitLock(10000);
-
     try {
-      var cell = meta.getRange("B1");
-      var current = Number(cell.getValue()) || 0;
-      var updated = current + 1;
+      const cell = meta.getRange("B1");
+      const current = Number(cell.getValue()) || 0;
+      const updated = current + 1;
       cell.setValue(updated);
-      return _json({ ok: true, ideas_submitted: updated });
+
+      return ContentService
+        .createTextOutput(JSON.stringify({ ok: true, ideas_submitted: updated }))
+        .setMimeType(ContentService.MimeType.JSON);
     } finally {
       lock.releaseLock();
     }
   } catch (err) {
-    return _json({ ok: false, error: String(err && err.message ? err.message : err) });
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: String(err && err.message ? err.message : err) }))
+      .setMimeType(ContentService.MimeType.JSON);
   }
-}
-
-function doGet() {
-  try {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var meta = ss.getSheetByName("Meta");
-    if (!meta) throw new Error('Missing sheet tab "Meta"');
-    var val = Number(meta.getRange("B1").getValue()) || 0;
-    return _json({ ok: true, ideas_submitted: val });
-  } catch (err) {
-    return _json({ ok: false, error: String(err && err.message ? err.message : err) });
-  }
-}
-
-function _json(obj) {
-  return ContentService
-    .createTextOutput(JSON.stringify(obj))
-    .setMimeType(ContentService.MimeType.JSON);
 }
