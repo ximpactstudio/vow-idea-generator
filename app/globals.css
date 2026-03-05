@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --vow-gold: #c9a227;
+  --vow-navy: #1b365d;
+  --vow-cream: #f8f6f0;
+  --vow-charcoal: #2d2d2d;
+}
+
+body {
+  @apply bg-vow-cream text-vow-charcoal antialiased;
+}
