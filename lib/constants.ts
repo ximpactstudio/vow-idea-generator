@@ -1,10 +1,10 @@
 export const IDEA_SPARKS = [
   "Where does money already flow that could include VOW?",
-  "What ritual moment could naturally include giving?",
-  "What would make giving feel like part of the ceremony?",
   "Who else could be the giver besides the couple?",
-  "Where could giving happen automatically?",
-  "What partnership could unlock new giving behavior?",
+  "What would make giving feel like part of the moment?",
+  "What could make giving happen automatically?",
+  "What partnership could unlock a new stream of giving?",
+  "What's one friction we could remove to increase giving?",
 ];
 
 export const NUDGES = [

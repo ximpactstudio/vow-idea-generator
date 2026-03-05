@@ -6,7 +6,7 @@ import { IdeaBooster } from "./IdeaBooster";
 import { NUDGES, SHORT_IDEA_THRESHOLD } from "@/lib/constants";
 
 interface IdeaFormProps {
-  onSuccess: (summary: ClassificationSummary) => void;
+  onSuccess: (summary: ClassificationSummary, ideasSubmitted?: number) => void;
 }
 
 export function IdeaForm({ onSuccess }: IdeaFormProps) {
@@ -49,17 +49,18 @@ export function IdeaForm({ onSuccess }: IdeaFormProps) {
         setError(data.error ?? "Something went wrong. Please try again.");
         return;
       }
-      if (data.classification) {
-        onSuccess(data.classification);
-      } else {
-        onSuccess({
-          idea_h1: trimmed.slice(0, 80),
-          idea_h2: "",
-          bullets: [trimmed.slice(0, 120)],
-          type: "Model",
-          horizon: "H1",
-        });
-      }
+      const summary = data.classification
+        ? data.classification
+        : {
+            idea_h1: trimmed.slice(0, 80),
+            idea_h2: "",
+            bullets: [trimmed.slice(0, 120)],
+            type: "Model",
+            horizon: "H1",
+          };
+      const newCount =
+        typeof data.ideas_submitted === "number" ? data.ideas_submitted : undefined;
+      onSuccess(summary, newCount);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -87,7 +88,7 @@ export function IdeaForm({ onSuccess }: IdeaFormProps) {
       </div>
 
       <div>
-        <label htmlFor="idea" className="block text-sm font-medium text-vow-navy">
+        <label htmlFor="idea" className="block text-sm font-semibold uppercase tracking-wider text-[#1a1a1a]/90">
           Idea
         </label>
         <textarea
@@ -98,11 +99,10 @@ export function IdeaForm({ onSuccess }: IdeaFormProps) {
           placeholder='e.g. "What if couples could automatically donate when guests RSVP?"'
           value={idea}
           onChange={(e) => setIdea(e.target.value)}
-          className="mt-1.5 w-full rounded-lg border border-vow-charcoal/20 bg-white px-4 py-3 text-vow-charcoal placeholder:text-vow-charcoal/50 focus:border-vow-gold focus:outline-none focus:ring-1 focus:ring-vow-gold"
+          className="mt-3 w-full rounded-lg border border-black/12 bg-white px-4 py-3 text-[#1a1a1a] placeholder:text-[#1a1a1a]/40 focus:border-[#1a1a1a] focus:outline-none focus:ring-1 focus:ring-[#1a1a1a]"
         />
-        <p className="mt-1.5 text-sm text-vow-charcoal/60">
-          Big, small, half-formed — all ideas welcome. This field is required.
-          Everything else is optional.
+        <p className="mt-2 text-sm text-[#1a1a1a]/60">
+          Big, small, half-formed — all ideas welcome.
         </p>
       </div>
 
@@ -114,77 +114,77 @@ export function IdeaForm({ onSuccess }: IdeaFormProps) {
       />
 
       {/* Optional expandable */}
-      <div className="rounded-lg border border-vow-charcoal/10 bg-white/60">
+      <div className="rounded-lg border border-black/8 bg-[#fafaf9]">
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
-          className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-vow-charcoal/80 hover:text-vow-navy"
+          className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-[#1a1a1a]/80 hover:text-[#1a1a1a]"
         >
           Add more context (optional)
-          <span className="text-vow-gold">{expanded ? "−" : "+"}</span>
+          <span className="text-[#1a1a1a]/60">{expanded ? "−" : "+"}</span>
         </button>
         {expanded && (
-          <div className="space-y-4 border-t border-vow-charcoal/10 px-4 pb-4 pt-2">
+          <div className="space-y-4 border-t border-black/8 px-4 pb-4 pt-3">
             <div>
-              <label className="block text-xs font-medium text-vow-charcoal/60">
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#1a1a1a]/70">
                 What makes this repeatable?
               </label>
-              <p className="text-xs text-vow-charcoal/50">
+              <p className="mt-0.5 text-xs text-[#1a1a1a]/50">
                 If this works once, what makes it happen again?
               </p>
               <input
                 type="text"
                 value={repeatability}
                 onChange={(e) => setRepeatability(e.target.value)}
-                className="mt-1 w-full rounded border border-vow-charcoal/15 bg-white/80 px-3 py-2 text-sm text-vow-charcoal placeholder:text-vow-charcoal/40 focus:border-vow-gold/50 focus:outline-none"
+                className="mt-2 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#1a1a1a]/40 focus:border-[#1a1a1a] focus:outline-none"
                 placeholder="Optional"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-vow-charcoal/60">
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#1a1a1a]/70">
                 Who is this for?
               </label>
               <input
                 type="text"
                 value={whoFor}
                 onChange={(e) => setWhoFor(e.target.value)}
-                className="mt-1 w-full rounded border border-vow-charcoal/15 bg-white/80 px-3 py-2 text-sm text-vow-charcoal placeholder:text-vow-charcoal/40 focus:border-vow-gold/50 focus:outline-none"
+                className="mt-2 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#1a1a1a]/40 focus:border-[#1a1a1a] focus:outline-none"
                 placeholder="Optional"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-vow-charcoal/60">
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#1a1a1a]/70">
                 What moment does it connect to?
               </label>
               <input
                 type="text"
                 value={moment}
                 onChange={(e) => setMoment(e.target.value)}
-                className="mt-1 w-full rounded border border-vow-charcoal/15 bg-white/80 px-3 py-2 text-sm text-vow-charcoal placeholder:text-vow-charcoal/40 focus:border-vow-gold/50 focus:outline-none"
+                className="mt-2 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#1a1a1a]/40 focus:border-[#1a1a1a] focus:outline-none"
                 placeholder="Optional"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-vow-charcoal/60">
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#1a1a1a]/70">
                 What would success look like?
               </label>
               <input
                 type="text"
                 value={success}
                 onChange={(e) => setSuccess(e.target.value)}
-                className="mt-1 w-full rounded border border-vow-charcoal/15 bg-white/80 px-3 py-2 text-sm text-vow-charcoal placeholder:text-vow-charcoal/40 focus:border-vow-gold/50 focus:outline-none"
+                className="mt-2 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#1a1a1a]/40 focus:border-[#1a1a1a] focus:outline-none"
                 placeholder="Optional"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-vow-charcoal/60">
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#1a1a1a]/70">
                 Any links or references?
               </label>
               <input
                 type="text"
                 value={links}
                 onChange={(e) => setLinks(e.target.value)}
-                className="mt-1 w-full rounded border border-vow-charcoal/15 bg-white/80 px-3 py-2 text-sm text-vow-charcoal placeholder:text-vow-charcoal/40 focus:border-vow-gold/50 focus:outline-none"
+                className="mt-2 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#1a1a1a]/40 focus:border-[#1a1a1a] focus:outline-none"
                 placeholder="Optional"
               />
             </div>
@@ -201,7 +201,7 @@ export function IdeaForm({ onSuccess }: IdeaFormProps) {
       <button
         type="submit"
         disabled={loading || !idea.trim()}
-        className="w-full rounded-lg bg-vow-navy px-4 py-3 font-medium text-white transition hover:bg-vow-navy-light disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto sm:px-8"
+        className="w-full rounded-full bg-[#1a1a1a] px-6 py-3.5 font-semibold text-white transition hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto sm:px-10"
       >
         {loading ? "Submitting…" : "Submit idea"}
       </button>

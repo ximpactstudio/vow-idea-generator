@@ -72,8 +72,25 @@ export async function POST(request: NextRequest) {
           { status: 502 }
         );
       }
-    }
 
+      const webhookData = await res.json().catch(() => ({}));
+      const ideasSubmitted =
+        typeof webhookData.ideas_submitted === "number"
+          ? webhookData.ideas_submitted
+          : undefined;
+
+      return NextResponse.json({
+        ok: true,
+        classification: {
+          idea_h1: classification.idea_h1,
+          idea_h2: classification.idea_h2,
+          bullets: classification.bullets,
+          type: classification.type,
+          horizon: classification.horizon,
+        },
+        ...(ideasSubmitted !== undefined && { ideas_submitted: ideasSubmitted }),
+      });
+    }
     return NextResponse.json({
       ok: true,
       classification: {

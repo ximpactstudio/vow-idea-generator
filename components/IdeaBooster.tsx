@@ -35,15 +35,17 @@ export function IdeaBooster({ idea, isShort, nudgeIndices, onIdeaUpdate }: IdeaB
 
   if (!idea.trim()) return null;
 
+  const displayNudges = nudgeIndices.slice(0, 2).map((i) => NUDGES[i]);
+
   return (
-    <div className="rounded-lg border border-vow-gold/20 bg-vow-gold/5 px-4 py-3">
-      <p className="text-sm text-vow-navy/90">
+    <div className="rounded-lg border border-black/8 bg-[#fafaf9] px-4 py-3">
+      <p className="text-sm text-[#1a1a1a]/80">
         {isShort ? (
           <>Nice — clear starting point.</>
         ) : (
           <>
             Consider:{" "}
-            {nudgeIndices.slice(0, 2).map((i) => NUDGES[i]).join(" • ")}
+            {displayNudges.join(" • ")}
           </>
         )}
       </p>
@@ -52,30 +54,30 @@ export function IdeaBooster({ idea, isShort, nudgeIndices, onIdeaUpdate }: IdeaB
           type="button"
           onClick={handleImprove}
           disabled={improving}
-          className="text-xs font-medium text-vow-gold-dark underline hover:no-underline disabled:opacity-50"
+          className="text-xs font-medium text-[#1a1a1a]/70 underline hover:no-underline hover:text-[#1a1a1a] disabled:opacity-50"
         >
           {improving ? "Thinking…" : "Improve clarity (optional)"}
         </button>
       </div>
       {suggestion && (
-        <div className="mt-3 rounded border border-vow-gold/30 bg-white/80 p-3">
-          <p className="text-xs font-medium text-vow-charcoal/70">Suggested refinement:</p>
-          <p className="mt-1 text-sm text-vow-charcoal">{suggestion}</p>
-          <div className="mt-2 flex gap-2">
+        <div className="mt-3 rounded-lg border border-black/8 bg-white p-3">
+          <p className="text-xs font-medium uppercase tracking-wider text-[#1a1a1a]/60">Suggested refinement</p>
+          <p className="mt-1.5 text-sm text-[#1a1a1a]">{suggestion}</p>
+          <div className="mt-3 flex gap-2">
             <button
               type="button"
               onClick={() => {
                 onIdeaUpdate(suggestion);
                 setSuggestion(null);
               }}
-              className="rounded bg-vow-gold/20 px-2 py-1 text-xs font-medium text-vow-navy hover:bg-vow-gold/30"
+              className="rounded-full bg-[#1a1a1a] px-3 py-1.5 text-xs font-medium text-white hover:bg-black"
             >
               Use this
             </button>
             <button
               type="button"
               onClick={() => setSuggestion(null)}
-              className="text-xs text-vow-charcoal/60 hover:text-vow-charcoal"
+              className="text-xs text-[#1a1a1a]/60 hover:text-[#1a1a1a]"
             >
               Keep mine
             </button>

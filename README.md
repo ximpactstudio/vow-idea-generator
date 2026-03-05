@@ -47,11 +47,13 @@ Edit `.env.local`:
 5. Click **Deploy**, authorize if prompted, then copy the **Web app URL**.
 6. Put that URL in `.env.local` as `GOOGLE_APPS_SCRIPT_WEBHOOK_URL`.
 
-The script creates a sheet named **Ideas** and uses these columns (row 1):
+The script uses two sheet tabs:
 
-`Timestamp`, `Idea (raw)`, `Repeatability`, `Who for`, `Moment`, `Success`, `Links`, `Idea H1`, `Idea H2`, `Bullets`, `Type`, `Horizon`, `Component Area`, `Tags`, `Confidence`, `Rationale`, `Source`, `Status`
+- **Idea Intake**: One row per submission. If missing, the script creates it with headers in row 1:  
+  `Timestamp`, `Idea (raw)`, `Repeatability`, `Who for`, `Moment`, `Success`, `Links`, `Idea H1`, `Idea H2`, `Bullets`, `Type`, `Horizon`, `Component Area`, `Tags`, `Confidence`, `Rationale`, `Source`, `Status`  
+  `Source` and `Status` are set to "Web intake" and "New" by the Next.js app.
 
-`Source` and `Status` are set to "Web intake" and "New" by the Next.js app.
+- **Meta** (Ideas Submitted counter): The script creates this tab if missing. Cell **A1** holds the total number of ideas submitted (integer). Set the initial value to **172** (or any starting count). On each successful POST the script increments A1 and returns `{ ok: true, ideas_submitted: <newCount> }`. The Next.js app uses this for the "Ideas submitted" counter and also supports GET on the same Web App URL to read the current count for initial page load.
 
 ### 3. Run locally
 
@@ -70,12 +72,9 @@ See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for step-by-step instructions:
 
 Other hosts: run `npm run build` and `npm start`; set the same environment variables.
 
-## Optional: ideas count
+## Ideas submitted counter
 
-The line *"Ideas submitted this month: —"* is a placeholder. To make it dynamic you can:
-
-- Use a serverless function that reads from the same Google Sheet (e.g. via Apps Script or Google Sheets API) and returns the count for the current month, or
-- Store a count in a small DB or Vercel KV and increment it on each successful submit.
+The "Ideas submitted" value is stored in the Google Sheet **Meta** tab, cell **A1**. Set the initial value to **172** (or your starting count). The Apps Script increments it on each successful POST and returns the new count; the UI updates immediately after a successful submission. If the Meta sheet or A1 is missing, the script creates the sheet and initializes A1 to 172.
 
 ## Security
 

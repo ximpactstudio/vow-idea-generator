@@ -10,5 +10,5 @@
 }
 
 body {
-  @apply bg-vow-cream text-vow-charcoal antialiased;
+  @apply bg-[#fafaf9] text-[#1a1a1a] antialiased;
 }
