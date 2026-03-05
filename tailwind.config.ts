@@ -10,13 +10,10 @@ const config: Config = {
     extend: {
       colors: {
         vow: {
-          gold: "#C9A227",
-          "gold-light": "#E8D48B",
-          "gold-dark": "#9A7B1A",
-          navy: "#1B365D",
-          "navy-light": "#2C4A7C",
-          cream: "#F8F6F0",
-          charcoal: "#2D2D2D",
+          coral: "#FD5650",
+          navy: "#1F2A44",
+          blush: "#FAD2D1",
+          muted: "#5A5A5A",
         },
       },
       fontFamily: {

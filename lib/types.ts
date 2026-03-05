@@ -28,6 +28,8 @@ export interface ClassificationResult {
 
 export interface SubmitPayload {
   idea: string;
+  name?: string;
+  email?: string;
   repeatability?: string;
   whoFor?: string;
   moment?: string;
@@ -46,6 +48,8 @@ export interface ClassificationSummary {
 
 export interface SheetRow {
   Timestamp: string;
+  Name: string;
+  Email: string;
   "Idea (raw)": string;
   Repeatability: string;
   "Who for": string;

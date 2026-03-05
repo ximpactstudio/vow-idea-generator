@@ -11,6 +11,8 @@ interface IdeaFormProps {
 
 export function IdeaForm({ onSuccess }: IdeaFormProps) {
   const [idea, setIdea] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [repeatability, setRepeatability] = useState("");
   const [whoFor, setWhoFor] = useState("");
   const [moment, setMoment] = useState("");
@@ -36,6 +38,8 @@ export function IdeaForm({ onSuccess }: IdeaFormProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           idea: trimmed,
+          name: name.trim() || undefined,
+          email: email.trim() || undefined,
           repeatability: repeatability.trim() || undefined,
           whoFor: whoFor.trim() || undefined,
           moment: moment.trim() || undefined,
@@ -88,7 +92,7 @@ export function IdeaForm({ onSuccess }: IdeaFormProps) {
       </div>
 
       <div>
-        <label htmlFor="idea" className="block text-sm font-semibold uppercase tracking-wider text-[#1a1a1a]/90">
+        <label htmlFor="idea" className="block text-sm font-semibold uppercase tracking-wider text-vow-navy">
           Idea
         </label>
         <textarea
@@ -99,9 +103,9 @@ export function IdeaForm({ onSuccess }: IdeaFormProps) {
           placeholder='e.g. "What if couples could automatically donate when guests RSVP?"'
           value={idea}
           onChange={(e) => setIdea(e.target.value)}
-          className="mt-3 w-full rounded-lg border border-black/12 bg-white px-4 py-3 text-[#1a1a1a] placeholder:text-[#1a1a1a]/40 focus:border-[#1a1a1a] focus:outline-none focus:ring-1 focus:ring-[#1a1a1a]"
+          className="mt-3 w-full rounded-lg border border-vow-navy/15 bg-white px-4 py-3 text-vow-navy placeholder:text-vow-muted focus:border-vow-coral focus:outline-none focus:ring-1 focus:ring-vow-coral"
         />
-        <p className="mt-2 text-sm text-[#1a1a1a]/60">
+        <p className="mt-2 text-sm text-vow-muted">
           Big, small, half-formed — all ideas welcome.
         </p>
       </div>
@@ -113,78 +117,105 @@ export function IdeaForm({ onSuccess }: IdeaFormProps) {
         onIdeaUpdate={setIdea}
       />
 
-      {/* Optional expandable */}
-      <div className="rounded-lg border border-black/8 bg-[#fafaf9]">
+      {/* Optional expandable: Name, Email + context */}
+      <div className="rounded-lg border border-vow-navy/10 bg-white">
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
-          className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-[#1a1a1a]/80 hover:text-[#1a1a1a]"
+          className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-vow-muted hover:text-vow-navy"
         >
           Add more context (optional)
-          <span className="text-[#1a1a1a]/60">{expanded ? "−" : "+"}</span>
+          <span className="text-vow-coral">{expanded ? "−" : "+"}</span>
         </button>
         {expanded && (
-          <div className="space-y-4 border-t border-black/8 px-4 pb-4 pt-3">
+          <div className="space-y-4 border-t border-vow-navy/10 px-4 pb-4 pt-3">
             <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-[#1a1a1a]/70">
+              <label className="block text-xs font-medium uppercase tracking-wider text-vow-muted">
+                Your name (optional)
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="mt-2 w-full rounded-lg border border-vow-navy/10 bg-white px-3 py-2 text-sm text-vow-navy placeholder:text-vow-muted focus:border-vow-coral focus:outline-none"
+                placeholder="Optional"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium uppercase tracking-wider text-vow-muted">
+                Your email (optional)
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-2 w-full rounded-lg border border-vow-navy/10 bg-white px-3 py-2 text-sm text-vow-navy placeholder:text-vow-muted focus:border-vow-coral focus:outline-none"
+                placeholder="Optional"
+              />
+              <p className="mt-1 text-xs text-vow-muted">
+                Only if you&apos;re open to follow-up — we won&apos;t spam you.
+              </p>
+            </div>
+            <div>
+              <label className="block text-xs font-medium uppercase tracking-wider text-vow-muted">
                 What makes this repeatable?
               </label>
-              <p className="mt-0.5 text-xs text-[#1a1a1a]/50">
+              <p className="mt-0.5 text-xs text-vow-muted/80">
                 If this works once, what makes it happen again?
               </p>
               <input
                 type="text"
                 value={repeatability}
                 onChange={(e) => setRepeatability(e.target.value)}
-                className="mt-2 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#1a1a1a]/40 focus:border-[#1a1a1a] focus:outline-none"
+                className="mt-2 w-full rounded-lg border border-vow-navy/10 bg-white px-3 py-2 text-sm text-vow-navy placeholder:text-vow-muted focus:border-vow-coral focus:outline-none"
                 placeholder="Optional"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-[#1a1a1a]/70">
+              <label className="block text-xs font-medium uppercase tracking-wider text-vow-muted">
                 Who is this for?
               </label>
               <input
                 type="text"
                 value={whoFor}
                 onChange={(e) => setWhoFor(e.target.value)}
-                className="mt-2 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#1a1a1a]/40 focus:border-[#1a1a1a] focus:outline-none"
+                className="mt-2 w-full rounded-lg border border-vow-navy/10 bg-white px-3 py-2 text-sm text-vow-navy placeholder:text-vow-muted focus:border-vow-coral focus:outline-none"
                 placeholder="Optional"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-[#1a1a1a]/70">
+              <label className="block text-xs font-medium uppercase tracking-wider text-vow-muted">
                 What moment does it connect to?
               </label>
               <input
                 type="text"
                 value={moment}
                 onChange={(e) => setMoment(e.target.value)}
-                className="mt-2 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#1a1a1a]/40 focus:border-[#1a1a1a] focus:outline-none"
+                className="mt-2 w-full rounded-lg border border-vow-navy/10 bg-white px-3 py-2 text-sm text-vow-navy placeholder:text-vow-muted focus:border-vow-coral focus:outline-none"
                 placeholder="Optional"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-[#1a1a1a]/70">
+              <label className="block text-xs font-medium uppercase tracking-wider text-vow-muted">
                 What would success look like?
               </label>
               <input
                 type="text"
                 value={success}
                 onChange={(e) => setSuccess(e.target.value)}
-                className="mt-2 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#1a1a1a]/40 focus:border-[#1a1a1a] focus:outline-none"
+                className="mt-2 w-full rounded-lg border border-vow-navy/10 bg-white px-3 py-2 text-sm text-vow-navy placeholder:text-vow-muted focus:border-vow-coral focus:outline-none"
                 placeholder="Optional"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-[#1a1a1a]/70">
+              <label className="block text-xs font-medium uppercase tracking-wider text-vow-muted">
                 Any links or references?
               </label>
               <input
                 type="text"
                 value={links}
                 onChange={(e) => setLinks(e.target.value)}
-                className="mt-2 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-[#1a1a1a] placeholder:text-[#1a1a1a]/40 focus:border-[#1a1a1a] focus:outline-none"
+                className="mt-2 w-full rounded-lg border border-vow-navy/10 bg-white px-3 py-2 text-sm text-vow-navy placeholder:text-vow-muted focus:border-vow-coral focus:outline-none"
                 placeholder="Optional"
               />
             </div>
@@ -201,7 +232,7 @@ export function IdeaForm({ onSuccess }: IdeaFormProps) {
       <button
         type="submit"
         disabled={loading || !idea.trim()}
-        className="w-full rounded-full bg-[#1a1a1a] px-6 py-3.5 font-semibold text-white transition hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto sm:px-10"
+        className="w-full rounded-full bg-vow-coral px-6 py-3.5 font-bold uppercase tracking-wider text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto sm:px-10"
       >
         {loading ? "Submitting…" : "Submit idea"}
       </button>

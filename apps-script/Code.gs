@@ -3,95 +3,87 @@
  * Deploy as Web App (Execute as: Me, Who has access: Anyone) to get a URL.
  * Set that URL as GOOGLE_APPS_SCRIPT_WEBHOOK_URL in your Next.js env.
  *
- * Sheets:
- * - "Idea Intake": one row per idea (headers in row 1).
- * - "Meta": cell A1 = Ideas Submitted count (number). Initialize to 172.
+ * Required sheet tabs (create them manually; script does not auto-create):
+ * - "Idea Intake": headers in row 1 must match the row order below.
+ * - "Meta": cell B1 = Ideas Submitted count (number). Set B1 to 172 initially.
  */
-
-function doGet() {
-  try {
-    var count = getIdeasSubmittedCount();
-    return createJsonResponse(200, { ideas_submitted: count });
-  } catch (err) {
-    console.error(err);
-    return createJsonResponse(500, { ideas_submitted: 172, error: err.toString() });
-  }
-}
 
 function doPost(e) {
   try {
-    var body = e.postData && e.postData.contents ? JSON.parse(e.postData.contents) : {};
-    var sheet = getIdeaIntakeSheet();
-    var headers = getHeaders(sheet);
-    var row = mapToRow(body, headers);
-    sheet.appendRow(row);
-    var newCount = incrementIdeasSubmittedCount();
-    return createJsonResponse(200, { ok: true, ideas_submitted: newCount });
-  } catch (err) {
-    console.error(err);
-    return createJsonResponse(500, { ok: false, error: err.toString() });
-  }
-}
+    var payload = JSON.parse(e.postData.contents || "{}");
 
-function getIdeaIntakeSheet() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Idea Intake');
-  if (!sheet) {
-    sheet = ss.insertSheet('Idea Intake');
-    var headers = [
-      'Timestamp', 'Idea (raw)', 'Repeatability', 'Who for', 'Moment', 'Success', 'Links',
-      'Idea H1', 'Idea H2', 'Bullets', 'Type', 'Horizon', 'Component Area', 'Tags',
-      'Confidence', 'Rationale', 'Source', 'Status'
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var intake = ss.getSheetByName("Idea Intake");
+    if (!intake) throw new Error('Missing sheet tab "Idea Intake"');
+
+    var meta = ss.getSheetByName("Meta");
+    if (!meta) throw new Error('Missing sheet tab "Meta" (create Meta, set B1 = 172)');
+
+    // Helper: accept both Next.js keys ("Idea (raw)") and snake_case (idea_raw)
+    var get = function(key, snakeKey, def) {
+      def = def || "";
+      if (payload[key] != null && payload[key] !== "") return payload[key];
+      if (snakeKey && payload[snakeKey] != null && payload[snakeKey] !== "") return payload[snakeKey];
+      return def;
+    };
+
+    var now = new Date();
+    var row = [
+      now,
+      get("Idea (raw)", "idea_raw") || get("idea"),
+      get("Repeatability", "repeatability"),
+      get("Name", "name"),
+      get("Email", "email"),
+      get("Who for", "who_for"),
+      get("Moment", "moment"),
+      get("Success", "success"),
+      get("Links", "links"),
+      get("Idea H1", "idea_h1"),
+      get("Idea H2", "idea_h2"),
+      Array.isArray(payload.Bullets) ? payload.Bullets.join(" | ") : (Array.isArray(payload.bullets) ? payload.bullets.join(" | ") : (get("Bullets", "bullets") || "")),
+      get("Type", "type"),
+      get("Horizon", "horizon"),
+      get("Component Area", "component_area"),
+      Array.isArray(payload.Tags) ? payload.Tags.join(", ") : (get("Tags", "tags") || ""),
+      get("Confidence", "confidence"),
+      get("Rationale", "rationale"),
+      get("Source", "source") || "Web intake",
+      get("Status", "status") || "New",
     ];
-    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+    intake.appendRow(row);
+
+    // Increment counter atomically (LockService prevents race conditions)
+    var lock = LockService.getScriptLock();
+    lock.waitLock(10000);
+
+    try {
+      var cell = meta.getRange("B1");
+      var current = Number(cell.getValue()) || 0;
+      var updated = current + 1;
+      cell.setValue(updated);
+      return _json({ ok: true, ideas_submitted: updated });
+    } finally {
+      lock.releaseLock();
+    }
+  } catch (err) {
+    return _json({ ok: false, error: String(err && err.message ? err.message : err) });
   }
-  return sheet;
 }
 
-function getMetaSheet() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Meta');
-  if (!sheet) {
-    sheet = ss.insertSheet('Meta');
-    sheet.getRange('A1').setValue(172);
-    sheet.getRange('A1').setNumberFormat('0');
+function doGet() {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var meta = ss.getSheetByName("Meta");
+    if (!meta) throw new Error('Missing sheet tab "Meta"');
+    var val = Number(meta.getRange("B1").getValue()) || 0;
+    return _json({ ok: true, ideas_submitted: val });
+  } catch (err) {
+    return _json({ ok: false, error: String(err && err.message ? err.message : err) });
   }
-  return sheet;
 }
 
-function getIdeasSubmittedCount() {
-  var sheet = getMetaSheet();
-  var val = sheet.getRange('A1').getValue();
-  var num = typeof val === 'number' ? val : parseInt(String(val), 10);
-  return isNaN(num) ? 172 : Math.max(0, Math.floor(num));
-}
-
-function incrementIdeasSubmittedCount() {
-  var sheet = getMetaSheet();
-  var current = getIdeasSubmittedCount();
-  var newCount = current + 1;
-  sheet.getRange('A1').setValue(newCount);
-  sheet.getRange('A1').setNumberFormat('0');
-  return newCount;
-}
-
-function getHeaders(sheet) {
-  return sheet.getRange(1, 1, 1, 18).getValues()[0];
-}
-
-function mapToRow(body, headers) {
-  var row = [];
-  for (var i = 0; i < headers.length; i++) {
-    var key = headers[i];
-    var value = body[key] != null ? String(body[key]) : '';
-    row.push(value);
-  }
-  return row;
-}
-
-function createJsonResponse(statusCode, data) {
+function _json(obj) {
   return ContentService
-    .createTextOutput(JSON.stringify(data))
+    .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }

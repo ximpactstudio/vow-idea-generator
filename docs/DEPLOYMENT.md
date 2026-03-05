@@ -19,7 +19,7 @@ Step-by-step instructions to deploy the app on **Vercel** and connect it to **Go
 
 1. Go to [Google Sheets](https://sheets.google.com) and create a new spreadsheet.
 2. Name it (e.g. **VOW Idea Intake**).
-3. You can leave it empty — the script will create the **Idea Intake** sheet (and **Meta** sheet for the ideas count) on first use.
+3. Create two sheet tabs: **Idea Intake** (with headers in row 1 — see README for column order) and **Meta** (set cell **B1** to **172**). The script does not auto-create these tabs.
 
 ### 1.2 Open Apps Script
 
@@ -53,10 +53,10 @@ You can test that the script accepts POSTs:
 ```bash
 curl -X POST "YOUR_WEB_APP_URL" \
   -H "Content-Type: application/json" \
-  -d '{"Timestamp":"2025-03-05T12:00:00Z","Idea (raw)":"Test idea","Repeatability":"","Who for":"","Moment":"","Success":"","Links":"","Idea H1":"Test","Idea H2":"","Bullets":"Test","Type":"Model","Horizon":"H1","Component Area":"","Tags":"","Confidence":"low","Rationale":"","Source":"Web intake","Status":"New"}'
+  -d '{"Timestamp":"2025-03-05T12:00:00Z","Name":"","Email":"","Idea (raw)":"Test idea","Repeatability":"","Who for":"","Moment":"","Success":"","Links":"","Idea H1":"Test","Idea H2":"","Bullets":"Test","Type":"Model","Horizon":"H1","Component Area":"","Tags":"","Confidence":"low","Rationale":"","Source":"Web intake","Status":"New"}'
 ```
 
-If it works, the response is `{"ok":true,"ideas_submitted":173}` (or similar) and a new row appears in the **Idea Intake** sheet. The **Meta** sheet stores the "Ideas submitted" count in cell A1 (initial value 172).
+If it works, the response is `{"ok":true,"ideas_submitted":173}` (or similar) and a new row appears in the **Idea Intake** sheet. The **Meta** tab stores the "Ideas submitted" count in cell **B1** (set B1 to 172 before first use).
 
 ---
 

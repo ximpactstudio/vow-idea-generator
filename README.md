@@ -47,19 +47,21 @@ Edit `.env.local`:
 5. Click **Deploy**, authorize if prompted, then copy the **Web app URL**.
 6. Put that URL in `.env.local` as `GOOGLE_APPS_SCRIPT_WEBHOOK_URL`.
 
-The script uses two sheet tabs:
+The script expects two sheet tabs (create them manually; the script does not auto-create them):
 
-- **Idea Intake**: One row per submission. If missing, the script creates it with headers in row 1:  
-  `Timestamp`, `Idea (raw)`, `Repeatability`, `Who for`, `Moment`, `Success`, `Links`, `Idea H1`, `Idea H2`, `Bullets`, `Type`, `Horizon`, `Component Area`, `Tags`, `Confidence`, `Rationale`, `Source`, `Status`  
-  `Source` and `Status` are set to "Web intake" and "New" by the Next.js app.
+- **Idea Intake**: One row per submission. Row 1 must be headers in this order:  
+  `Timestamp`, `Idea (raw)`, `Repeatability`, `Name`, `Email`, `Who for`, `Moment`, `Success`, `Links`, `Idea H1`, `Idea H2`, `Bullets`, `Type`, `Horizon`, `Component Area`, `Tags`, `Confidence`, `Rationale`, `Source`, `Status`  
+  Name and Email are optional. `Source` and `Status` default to "Web intake" and "New".
 
-- **Meta** (Ideas Submitted counter): The script creates this tab if missing. Cell **A1** holds the total number of ideas submitted (integer). Set the initial value to **172** (or any starting count). On each successful POST the script increments A1 and returns `{ ok: true, ideas_submitted: <newCount> }`. The Next.js app uses this for the "Ideas submitted" counter and also supports GET on the same Web App URL to read the current count for initial page load.
+- **Meta** (Ideas Submitted counter): Create the tab and set cell **B1** to **172** (or your starting count). The script increments B1 on each successful POST and returns `{ ok: true, ideas_submitted: <newCount> }`. GET on the Web App URL returns the current count for initial page load. A lock is used so concurrent submissions don’t corrupt the count.
 
 ### 3. Run locally
 
 ```bash
 npm run dev
 ```
+
+**Logo:** Add your VOW logo as `public/branding/vow-logo.png` for the header. If the file is missing, the header shows the text “VOW for Girls”.
 
 Open [http://localhost:3000](http://localhost:3000). Submit an idea; it will be classified and, if the webhook is set, appended to the sheet.
 
@@ -74,7 +76,7 @@ Other hosts: run `npm run build` and `npm start`; set the same environment varia
 
 ## Ideas submitted counter
 
-The "Ideas submitted" value is stored in the Google Sheet **Meta** tab, cell **A1**. Set the initial value to **172** (or your starting count). The Apps Script increments it on each successful POST and returns the new count; the UI updates immediately after a successful submission. If the Meta sheet or A1 is missing, the script creates the sheet and initializes A1 to 172.
+The "Ideas submitted" value is stored in the **Meta** tab, cell **B1**. Create the Meta tab and set B1 to **172** (or your starting count). The script increments B1 on each successful POST and returns the new count; the UI updates immediately after a successful submission.
 
 ## Security
 

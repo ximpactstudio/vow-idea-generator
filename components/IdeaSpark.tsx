@@ -1,52 +1,60 @@
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
-import { IDEA_SPARKS } from "@/lib/constants";
+import { useEffect, useMemo, useState } from "react";
 
-function shuffle<T>(arr: T[]): T[] {
-  const out = [...arr];
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
-  }
-  return out;
+const ALL_PROMPTS = [
+  "Where does money already flow that could include VOW?",
+  "Who else could be the giver besides the couple?",
+  "What would make giving feel like part of the moment?",
+  "What could make giving happen automatically?",
+  "What partnership could unlock a new stream of giving?",
+  "What’s one friction we could remove to increase giving?",
+];
+
+function pickPrompts(count: number) {
+  const shuffled = [...ALL_PROMPTS].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
 }
 
-function pickTwoOrThree(arr: string[]): string[] {
-  const n = 2 + Math.floor(Math.random() * 2); // 2 or 3
-  const shuffled = shuffle(arr);
-  return shuffled.slice(0, Math.min(n, arr.length));
-}
+export default function IdeaSpark() {
+  // Render a stable initial state to avoid hydration mismatch
+  const initial = useMemo(() => ALL_PROMPTS.slice(0, 3), []);
+  const [prompts, setPrompts] = useState<string[]>(initial);
 
-export function IdeaSpark() {
-  const [prompts, setPrompts] = useState<string[]>(() => pickTwoOrThree(IDEA_SPARKS));
-
-  const reshuffle = useCallback(() => {
-    setPrompts(pickTwoOrThree(IDEA_SPARKS));
+  useEffect(() => {
+    // After hydration, randomize safely on the client
+    setPrompts(pickPrompts(3));
   }, []);
 
   return (
-    <div className="mt-14 pt-10 border-t border-black/8">
-      <h2 className="text-lg font-semibold tracking-tight text-[#1a1a1a]">
-        Struggling to come up with an idea?
-      </h2>
-      <p className="mt-2 text-sm text-[#1a1a1a]/65">
-        Here are a few prompts to help generate new thinking.
-      </p>
-      <ul className="mt-5 space-y-3">
-        {prompts.map((p, i) => (
-          <li key={`${i}-${p}`} className="font-semibold text-[#1a1a1a]">
-            {p}
-          </li>
-        ))}
-      </ul>
-      <button
-        type="button"
-        onClick={reshuffle}
-        className="mt-5 text-sm font-medium text-[#1a1a1a]/70 underline hover:text-[#1a1a1a] hover:no-underline"
-      >
-        Show new prompts
-      </button>
-    </div>
+    <section className="mt-10">
+      <div className="mx-auto max-w-3xl">
+        <h2 className="text-xl font-extrabold text-[var(--vow-ink)]">
+          Struggling to come up with an idea?
+        </h2>
+        <p className="mt-2 text-[var(--vow-muted)]">
+          Here are a few prompts to help generate new thinking.
+        </p>
+
+        <div className="mt-5 space-y-3">
+          {prompts.slice(0, 3).map((p) => (
+            <div
+              key={p}
+              className="text-lg font-bold text-[var(--vow-ink)]"
+            >
+              {p}
+            </div>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setPrompts(pickPrompts(3))}
+          className="mt-4 text-sm font-semibold text-[var(--vow-coral)] hover:underline"
+        >
+          Show new prompts
+        </button>
+      </div>
+    </section>
   );
 }

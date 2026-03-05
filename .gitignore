@@ -34,3 +34,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+GOOGLE_APPS_SCRIPT_WEBHOOK_URL=https://script.google.com/macros/s/AKfycbwy4PAYrAhXjwJ6kY-rgFqeCqN_Z3S0ta1jBy2LFiGybY-mC28kjtoUv8kKzQRJcjteJw/exec

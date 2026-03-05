@@ -3,12 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --vow-gold: #c9a227;
-  --vow-navy: #1b365d;
-  --vow-cream: #f8f6f0;
-  --vow-charcoal: #2d2d2d;
+  /* VOW campaign brand colors */
+  --vow-coral: #fd5650;
+  --vow-navy: #1f2a44;
+  --vow-blush: #fad2d1;
+  --vow-white: #ffffff;
+  --vow-muted: #5a5a5a;
 }
 
 body {
-  @apply bg-[#fafaf9] text-[#1a1a1a] antialiased;
+  @apply antialiased;
+  background-color: var(--vow-white);
+  color: var(--vow-navy);
 }

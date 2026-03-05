@@ -6,6 +6,8 @@ import type { SheetRow } from "@/lib/types";
 
 const bodySchema = z.object({
   idea: z.string().min(1).max(10000),
+  name: z.string().max(500).optional(),
+  email: z.string().max(500).optional(),
   repeatability: z.string().max(2000).optional(),
   whoFor: z.string().max(1000).optional(),
   moment: z.string().max(1000).optional(),
@@ -40,6 +42,8 @@ export async function POST(request: NextRequest) {
     if (webhookUrl) {
       const row: SheetRow = {
         Timestamp: new Date().toISOString(),
+        Name: parsed.name ?? "",
+        Email: parsed.email ?? "",
         "Idea (raw)": parsed.idea,
         Repeatability: parsed.repeatability ?? "",
         "Who for": parsed.whoFor ?? "",

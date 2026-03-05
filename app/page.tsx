@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { IdeaSpark } from "@/components/IdeaSpark";
+import { Header } from "@/components/Header";
+import IdeaSpark from "@/components/IdeaSpark";
 import { IdeaForm } from "@/components/IdeaForm";
 import { ThankYou } from "@/components/ThankYou";
 import type { ClassificationSummary } from "@/lib/types";
@@ -35,49 +36,45 @@ export default function IdeasPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      {/* Header: wordmark + micro-CTA */}
-      <header className="border-b border-black/5 bg-[#fafaf9]">
-        <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-4">
-          <span className="text-sm font-semibold tracking-tight text-[#1a1a1a]">
-            VOW for Girls
-          </span>
-          <span className="text-xs font-medium uppercase tracking-widest text-[#1a1a1a]/70">
-            Take the VOW
-          </span>
-        </div>
-      </header>
+      <Header />
 
-      {/* Hero band */}
-      <section className="border-b border-black/5 bg-[#fafaf9] px-6 pb-12 pt-10 sm:pb-16 sm:pt-14">
-        <div className="mx-auto max-w-2xl text-center">
-          <h1 className="text-2xl font-semibold uppercase tracking-tight text-[#1a1a1a] sm:text-3xl">
-            Submit a Model Innovation Idea
-          </h1>
-          <p className="mt-4 mx-auto max-w-lg text-base text-[#1a1a1a]/75 sm:text-lg leading-relaxed">
-            Take two minutes to help shape the future of VOW — and help end child marriage.
-          </p>
-          <p className="mt-5 text-sm font-normal text-[#1a1a1a]/55">
-            Your idea helps us unlock more funding for girls&apos; futures.
-          </p>
-        </div>
-      </section>
+      {/* Blush hero band: full width */}
+      <section className="bg-vow-blush">
+        <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
+          {/* Left-aligned hero copy */}
+          <div className="max-w-2xl">
+            <h1 className="text-3xl font-bold uppercase leading-tight tracking-tight text-vow-navy sm:text-4xl md:text-[2.75rem]">
+              Submit a{" "}
+              <span className="bg-vow-navy px-1.5 py-0.5 text-white">Model</span>{" "}
+              <span className="bg-vow-navy px-1.5 py-0.5 text-white">Innovation</span>{" "}
+              Idea
+            </h1>
+            <p className="mt-5 text-base text-vow-navy/90 sm:text-lg leading-relaxed">
+              Take two minutes to help shape the future of VOW — and help end child marriage.
+            </p>
+            <p className="mt-4 text-sm text-vow-muted">
+              Your idea helps us unlock more funding for girls&apos; futures.
+            </p>
+          </div>
 
-      {/* Form section */}
-      <section className="px-6 py-12 sm:py-16">
-        <div className="mx-auto max-w-xl">
-          <IdeaForm
-            onSuccess={(summary, newCount) => {
-              setSubmitted(summary);
-              if (typeof newCount === "number") setIdeasCount(newCount);
-            }}
-          />
+          {/* Form card: white panel inside blush */}
+          <div className="mt-10 sm:mt-12">
+            <div className="rounded-lg border border-vow-navy/10 bg-white p-6 shadow-sm sm:p-8">
+              <IdeaForm
+                onSuccess={(summary, newCount) => {
+                  setSubmitted(summary);
+                  if (typeof newCount === "number") setIdeasCount(newCount);
+                }}
+              />
+            </div>
+          </div>
 
-          {/* Ideas submitted counter: below form/CTA */}
-          <div className="mt-10 flex flex-col items-center gap-1 border-t border-black/8 pt-8">
-            <span className="text-xs font-medium uppercase tracking-wider text-[#1a1a1a]/55">
+          {/* Ideas submitted counter */}
+          <div className="mt-10 flex flex-col gap-1 border-t border-vow-navy/10 pt-8">
+            <span className="text-xs font-semibold uppercase tracking-wider text-vow-muted">
               Ideas submitted
             </span>
-            <span className="text-3xl font-bold tracking-tight text-[#1a1a1a] sm:text-4xl">
+            <span className="text-4xl font-bold tracking-tight text-vow-navy sm:text-5xl">
               {ideasCount}
             </span>
           </div>
