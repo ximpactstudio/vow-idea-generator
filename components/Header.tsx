@@ -25,7 +25,6 @@ export default function Header() {
 
         {/* Navigation */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-semibold tracking-wide text-[var(--vow-ink)]">
-          
           <a
             href="https://www.vowforgirls.org/about"
             target="_blank"
@@ -70,7 +69,6 @@ export default function Header() {
           >
             BLOG
           </a>
-
         </nav>
 
         {/* Donate Button */}
