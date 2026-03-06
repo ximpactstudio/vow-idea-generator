@@ -1,22 +1,31 @@
 import { NextResponse } from "next/server";
 
-/**
- * GET /api/ideas-count
- * Fetches the current "Ideas submitted" count from the Apps Script Meta sheet
- * (doGet returns { ideas_submitted: number }). Used for initial page load.
- */
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const webhookUrl = process.env.GOOGLE_APPS_SCRIPT_WEBHOOK_URL;
+
   if (!webhookUrl) {
-    return NextResponse.json({ ideas_submitted: 172 });
+    return NextResponse.json(
+      { ideas_submitted: null, error: "Missing GOOGLE_APPS_SCRIPT_WEBHOOK_URL" },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
+    );
   }
-  try {
-    const res = await fetch(webhookUrl, { method: "GET", cache: "no-store" });
-    const data = await res.json().catch(() => ({}));
-    const count =
-      typeof data.ideas_submitted === "number" ? data.ideas_submitted : 172;
-    return NextResponse.json({ ideas_submitted: count });
-  } catch {
-    return NextResponse.json({ ideas_submitted: 172 });
-  }
+
+  // If your Apps Script supports doGet(), this should return JSON
+  const res = await fetch(webhookUrl, {
+    method: "GET",
+    cache: "no-store",
+  });
+
+  const data = await res.json();
+
+  return NextResponse.json(data, {
+    headers: {
+      // Extra aggressive no-cache headers (helps with CDNs/proxies)
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      Pragma: "no-cache",
+      Expires: "0",
+    },
+  });
 }
