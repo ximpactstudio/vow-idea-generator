@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Header } from "@/components/Header";
+import Header from "@/components/Header";
 import IdeaSpark from "@/components/IdeaSpark";
 import { IdeaForm } from "@/components/IdeaForm";
 import { ThankYou } from "@/components/ThankYou";
